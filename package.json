@@ -1,10 +1,11 @@
 {
   "name": "image-thumbnail-explorer",
-  "displayName": "image-thumbnail-explorer",
+  "displayName": "Image Thumbnail Explorer",
   "description": "\"An extension that help preview image thumbnail from the explorer tree\"",
+  "icon": "images/icon.png",
   "publisher": "marvel-dev",
   "repository": "https://github.com/Blue-Marvel/image-thumbnail-explorer.git",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "engines": {
     "vscode": "^1.110.0"
