@@ -49,7 +49,7 @@ Each file shows its actual image content as a small icon — not a generic file 
 
 ### From a `.vsix` file,
 
-- Download it from marketplace.
+- Download it from marketplace [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=marvel-dev.image-thumbnail-explorer) or [Open VSX Registry](https://open-vsx.org/extension/marvel-dev/image-thumbnail-explorer).
 - `cd` To the directory on your terminal and run the following commands.
 
 ### Visual Studio Code
