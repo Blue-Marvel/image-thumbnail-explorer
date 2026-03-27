@@ -47,11 +47,30 @@ Each file shows its actual image content as a small icon — not a generic file 
 3. Search for **Image Thumbnail Explorer**
 4. Click **Install**
 
-### From a `.vsix` file
+### From a `.vsix` file,
+
+- Download it from marketplace.
+- `cd` To the directory on your terminal and run the following commands.
+
+### Visual Studio Code
 
 ```bash
-code --install-extension image-thumbnail-explorer-0.0.1.vsix
+code --install-extension image-thumbnail-explorer-0.0.*.vsix
 ```
+
+### Antigravity
+
+```bash
+anitgravity --install-extension image-thumbnail-explorer-0.0.*.vsix
+```
+
+### Cursor
+
+```bash
+cursor --install-extension image-thumbnail-explorer-0.0.*.vsix
+```
+
+### Note: Make sure to replace the `*` with the current version
 
 ---
 
