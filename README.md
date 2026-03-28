@@ -1,3 +1,4 @@
+
 # 🖼️ Image Thumbnail Explorer
 
 > **See your images before you click them.** A VS Code extension that renders live thumbnails of `.png`, `.jpg`, `.jpeg`, `.svg`, and `.gif` files directly in your Explorer sidebar.
@@ -61,7 +62,7 @@ code --install-extension image-thumbnail-explorer-0.0.*.vsix
 ### Antigravity
 
 ```bash
-anitgravity --install-extension image-thumbnail-explorer-0.0.*.vsix
+antigravity --install-extension image-thumbnail-explorer-0.0.*.vsix
 ```
 
 ### Cursor
