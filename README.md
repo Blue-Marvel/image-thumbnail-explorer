@@ -61,7 +61,7 @@ code --install-extension image-thumbnail-explorer-0.0.*.vsix
 ### Antigravity
 
 ```bash
-anitgravity --install-extension image-thumbnail-explorer-0.0.*.vsix
+antigravity --install-extension image-thumbnail-explorer-0.0.*.vsix
 ```
 
 ### Cursor
@@ -78,7 +78,7 @@ cursor --install-extension image-thumbnail-explorer-0.0.*.vsix
 
 1. Open any folder or workspace in VS Code
 2. Look for the **Image Thumbnails** panel in the Explorer sidebar (below your file tree)
-3. If it's not visible, press `Ctrl+Shift+P` and search for **Image Thumbnails** to bring it into focus
+3. If it's not visible, press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open command palette and search for **Image Thumbnails** to bring it into focus
 4. Click any image to open it in the editor
 
 That's it — thumbnails load automatically. No configuration needed.

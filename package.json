@@ -5,7 +5,7 @@
   "icon": "images/icon.png",
   "publisher": "marvel-dev",
   "repository": "https://github.com/Blue-Marvel/image-thumbnail-explorer.git",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "license": "MIT",
   "engines": {
     "vscode": "^1.100.0"
@@ -13,7 +13,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:imageThumbnailExplorer"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "views": {
@@ -31,17 +33,109 @@
         "command": "imageThumbnailExplorer.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "imageThumbnailExplorer.rename",
+        "title": "Rename Image",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "imageThumbnailExplorer.delete",
+        "title": "Delete Image",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "imageThumbnailExplorer.copyPath",
+        "title": "Copy Path"
+      },
+      {
+        "command": "imageThumbnailExplorer.duplicate",
+        "title": "Duplicate Image"
+      },
+      {
+        "command": "imageThumbnailExplorer.add",
+        "title": "Add Image",
+        "icon": "$(add)"
       }
     ],
     "menus": {
       "view/title": [
         {
+          "command": "imageThumbnailExplorer.add",
+          "when": "view == imageThumbnailExplorer",
+          "group": "navigation@1"
+        },
+        {
           "command": "imageThumbnailExplorer.refresh",
           "when": "view == imageThumbnailExplorer",
-          "group": "navigation"
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "imageThumbnailExplorer.add",
+          "when": "view == imageThumbnailExplorer && viewItem == folder",
+          "group": "1_modification@1"
+        },
+        {
+          "command": "imageThumbnailExplorer.rename",
+          "when": "view == imageThumbnailExplorer && viewItem == image",
+          "group": "1_modification@2"
+        },
+        {
+          "command": "imageThumbnailExplorer.delete",
+          "when": "view == imageThumbnailExplorer && viewItem == image",
+          "group": "1_modification@3"
+        },
+        {
+          "command": "imageThumbnailExplorer.duplicate",
+          "when": "view == imageThumbnailExplorer && viewItem == image",
+          "group": "2_copying@1"
+        },
+        {
+          "command": "imageThumbnailExplorer.copyPath",
+          "when": "view == imageThumbnailExplorer && viewItem == image",
+          "group": "2_copying@2"
         }
       ]
-    }
+    },
+    "keybindings": [
+      {
+        "command": "imageThumbnailExplorer.rename",
+        "key": "f2",
+        "mac": "enter",
+        "when": "view == imageThumbnailExplorer && viewItem == image && listFocus"
+      },
+      {
+        "key": "enter",
+        "mac": "enter",
+        "command": "imageThumbnailExplorer.open",
+        "when": "focusedView == imageThumbnailExplorer && listFocus"
+      },
+      {
+        "key": "cmd+shift+c",
+        "command": "imageThumbnailExplorer.copyRelativePath",
+        "when": "focusedView == imageThumbnailExplorer && listFocus"
+      },
+      {
+        "command": "imageThumbnailExplorer.delete",
+        "key": "delete",
+        "mac": "cmd+backspace",
+        "when": "view == imageThumbnailExplorer && viewItem == image && listFocus"
+      },
+      {
+        "command": "imageThumbnailExplorer.copyPath",
+        "key": "shift+alt+c",
+        "mac": "alt+cmd+c",
+        "when": "view == imageThumbnailExplorer && viewItem == image && listFocus"
+      },
+      {
+        "command": "imageThumbnailExplorer.duplicate",
+        "key": "ctrl+d",
+        "mac": "cmd+d",
+        "when": "view == imageThumbnailExplorer && viewItem == image && listFocus"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

@@ -17,8 +17,87 @@ export function activate(context: vscode.ExtensionContext) {
 	const watcher = vscode.workspace.createFileSystemWatcher('**/*.{png,jpg,jpeg,svg,gif,webp}');
 	watcher.onDidCreate(() => provider.refresh());
 	watcher.onDidDelete(() => provider.refresh());
+	watcher.onDidChange(() => provider.refresh());
 
-	context.subscriptions.push(treeView, watcher);
+	context.subscriptions.push(
+		treeView,
+		watcher,
+		vscode.commands.registerCommand('imageThumbnailExplorer.refresh', () => provider.refresh()),
+		vscode.commands.registerCommand('imageThumbnailExplorer.delete', async (item?: ImageItem) => {
+			const target = item || treeView.selection[0];
+			if (!target || !target.resourceUri) { return; }
+			const label = typeof target.label === 'string' ? target.label : target.label?.label;
+			const confirm = await vscode.window.showWarningMessage(
+				`Are you sure you want to delete '${label}'?`,
+				{ modal: true },
+				'Delete'
+			);
+			if (confirm === 'Delete') {
+				await vscode.workspace.fs.delete(target.resourceUri, { useTrash: true });
+			}
+		}),
+		vscode.commands.registerCommand('imageThumbnailExplorer.rename', async (item?: ImageItem) => {
+			const target = item || treeView.selection[0];
+			if (!target || !target.resourceUri) { return; }
+			const oldName = typeof target.label === 'string' ? target.label : target.label?.label || '';
+			const lastDot = oldName.lastIndexOf('.');
+			const newName = await vscode.window.showInputBox({
+				prompt: 'Enter new name for the image',
+				value: oldName,
+				valueSelection: lastDot > 0 ? [0, lastDot] : undefined
+			});
+			if (newName && newName !== oldName) {
+				const newUri = vscode.Uri.file(path.join(path.dirname(target.resourceUri.fsPath), newName));
+				await vscode.workspace.fs.rename(target.resourceUri, newUri);
+			}
+		}),
+		vscode.commands.registerCommand('imageThumbnailExplorer.copyPath', async (item?: ImageItem) => {
+			const target = item || treeView.selection[0];
+			if (!target || !target.resourceUri) { return; }
+			await vscode.env.clipboard.writeText(target.resourceUri.fsPath);
+			vscode.window.showInformationMessage('Path copied to clipboard!');
+		}),
+		vscode.commands.registerCommand('imageThumbnailExplorer.duplicate', async (item?: ImageItem) => {
+			const target = item || treeView.selection[0];
+			if (!target || !target.resourceUri) { return; }
+			const ext = path.extname(target.resourceUri.fsPath);
+			const base = path.basename(target.resourceUri.fsPath, ext);
+			const newName = `${base} copy${ext}`;
+			const newUri = vscode.Uri.file(path.join(path.dirname(target.resourceUri.fsPath), newName));
+			await vscode.workspace.fs.copy(target.resourceUri, newUri);
+		}),
+		vscode.commands.registerCommand('imageThumbnailExplorer.add', async (item?: ImageItem) => {
+			const target = item || treeView.selection[0];
+			let targetPath = target?.resourceUri?.fsPath;
+			if (!targetPath || target?.contextValue !== 'folder') {
+				if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+					targetPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+				} else {
+					vscode.window.showErrorMessage('No workspace folder found to add images.');
+					return;
+				}
+			}
+
+			const uris = await vscode.window.showOpenDialog({
+				canSelectMany: true,
+				openLabel: 'Add Image(s)',
+				filters: {
+					'Images': ['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp']
+				}
+			});
+
+			if (uris && uris.length > 0) {
+				for (const uri of uris) {
+					const dest = vscode.Uri.file(path.join(targetPath, path.basename(uri.fsPath)));
+					try {
+						await vscode.workspace.fs.copy(uri, dest, { overwrite: false });
+					} catch (err) {
+						vscode.window.showErrorMessage(`Failed to add ${path.basename(uri.fsPath)}: It may already exist.`);
+					}
+				}
+			}
+		})
+	);
 }
 
 class ImageTreeProvider implements vscode.TreeDataProvider<ImageItem> {
@@ -36,7 +115,7 @@ class ImageTreeProvider implements vscode.TreeDataProvider<ImageItem> {
 	}
 
 	async getChildren(element?: ImageItem): Promise<ImageItem[]> {
-		if (!vscode.workspace.workspaceFolders) return [];
+		if (!vscode.workspace.workspaceFolders) { return []; }
 
 		const rootPath = element?.resourceUri?.fsPath
 			?? vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -49,7 +128,7 @@ class ImageTreeProvider implements vscode.TreeDataProvider<ImageItem> {
 		const items: ImageItem[] = [];
 
 		for (const entry of entries) {
-			if (entry.name.startsWith('.')) continue;
+			if (entry.name.startsWith('.')) { continue; }
 			const fullPath = path.join(dirPath, entry.name);
 			const uri = vscode.Uri.file(fullPath);
 
@@ -82,7 +161,7 @@ class ImageTreeProvider implements vscode.TreeDataProvider<ImageItem> {
 		try {
 			const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 			return entries.some(e => {
-				if (e.isDirectory()) return this.directoryHasImages(path.join(dirPath, e.name));
+				if (e.isDirectory()) { return this.directoryHasImages(path.join(dirPath, e.name)); }
 				return IMAGE_EXTENSIONS.includes(path.extname(e.name).toLowerCase());
 			});
 		} catch { return false; }
@@ -100,6 +179,7 @@ class ImageItem extends vscode.TreeItem {
 		this.tooltip = resourceUri.fsPath;
 
 		if (type === 'image') {
+			this.contextValue = 'image';
 			// 🔑 This is what shows the thumbnail!
 			this.iconPath = resourceUri;
 			this.command = {
@@ -108,6 +188,7 @@ class ImageItem extends vscode.TreeItem {
 				arguments: [resourceUri]
 			};
 		} else {
+			this.contextValue = 'folder';
 			this.iconPath = new vscode.ThemeIcon('folder');
 		}
 	}
