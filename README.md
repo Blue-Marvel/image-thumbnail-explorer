@@ -1,3 +1,4 @@
+
 # 🖼️ Image Thumbnail Explorer
 
 > **See your images before you click them.** A VS Code extension that renders live thumbnails of `.png`, `.jpg`, `.jpeg`, `.svg`, and `.gif` files directly in your Explorer sidebar.
